@@ -3,6 +3,22 @@ from requests import get
 from util import id_courier, vkusvill_token
 
 
+def print_parcels(parcels, name):
+    n = len(parcels)
+    if n > 0:
+        print(f"Parcels {name} ({n}): ")
+        for i, p in enumerate(parcels):
+            # Formatted data
+            weight = round(float(p['ves']))
+            distance = round(float(p['distance']))
+            address = p['corr_addr'].lstrip("Санкт-Петербург").strip()
+
+            # Format parcel
+            print(f"{i}) {weight}kg, {distance}m - {address}")
+    else:
+        print(f"Parcels {name}: \n- None")
+
+
 def main():
     api_url = "https://mobile.vkusvill.ru/api/sql/exec/"
 
@@ -34,40 +50,27 @@ def main():
         'date_to': date_to
     }
 
-    r1 = get(api_url, prepare_payload, headers=headers)
-    r2 = get(api_url, ready_payload, headers=headers)
-    r3 = get(api_url, taken_payload, headers=headers)
+    try:
+        # Possible HTTPError
+        r1 = get(api_url, prepare_payload, headers=headers)
+        r1.raise_for_status()
 
-    prepare = r1.json()[0]
-    ready = r2.json()[0]
-    taken = r3.json()[0]
+        r2 = get(api_url, ready_payload, headers=headers)
+        r2.raise_for_status()
 
-    def print_parcel(p):
-        distance = int(float(p['distance']))
-        weight = round(float(p['ves']))
-        address = p['corr_addr']
-        print(f"- {weight}kg, {distance}m - {address}")
+        r3 = get(api_url, taken_payload, headers=headers)
+        r3.raise_for_status()
 
-    print("Parcels prepare: ")
-    if len(prepare) > 0:
-        for p in prepare:
-            print_parcel(p)
+        # Possible ValueError
+        prepare = r1.json()[0]
+        ready = r2.json()[0]
+        taken = r3.json()[0]
+    except Exception as e:
+        print(f"HTTP respose error: {e}")
     else:
-        print("- No")
-
-    print("Parcels ready: ")
-    if len(ready) > 0:
-        for p in ready:
-            print_parcel(p)
-    else:
-        print("- No")
-
-    print("Parcels taken: ")
-    if len(ready) > 0:
-        for p in taken:
-            print_parcel(p)
-    else:
-        print("- No")
+        print_parcels(prepare, 'prepare')
+        print_parcels(ready, 'ready')
+        print_parcels(taken, 'taken')
 
 
 if __name__ == "__main__":
