@@ -1,9 +1,14 @@
+from datetime import datetime, timedelta
 from requests import get
 from util import id_courier, vkusvill_token
 
 
 def main():
     api_url = "https://mobile.vkusvill.ru/api/sql/exec/"
+
+    now = datetime.now()
+    date_from = (now - timedelta(days=3)).strftime('%Y%m%d')
+    date_to = (now + timedelta(days=3)).strftime('%Y%m%d')
 
     headers = {
         "x-vkusvill-device": "android",
@@ -18,15 +23,15 @@ def main():
     ready_payload = {
         'func': 'loyalty.dbo.Parcels_GetParcelsShop_new',
         'id_courier': id_courier,
-        'date_from': '20210801',
-        'date_to': '20210807'
+        'date_from': date_from,
+        'date_to': date_to
     }
 
     taken_payload = {
         'func': 'loyalty.dbo.Parcels_GetParcelsShop',
         'id_courier': id_courier,
-        'date_from': '20210801',
-        'date_to': '20210807'
+        'date_from': date_from,
+        'date_to': date_to
     }
 
     r1 = get(api_url, prepare_payload, headers=headers)
