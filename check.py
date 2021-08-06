@@ -11,12 +11,13 @@ def print_parcels(parcels, name):
             # Formatted data
             weight = round(float(p['ves']))
             distance = round(float(p['distance']))
-            address = p['corr_addr'].lstrip("Санкт-Петербург").strip()
+            address = p['corr_addr'].replace(
+                "Санкт-Петербург", '').strip(' ,-')
 
             # Format parcel
-            print(f"{i}) {weight}kg, {distance}m - {address}")
+            print(f"{i+1}) {weight}kg, {distance}m - {address} []")
     else:
-        print(f"Parcels {name}: \n- None")
+        print(f"Parcels {name}: \n- No")
 
 
 def main():
@@ -51,20 +52,17 @@ def main():
     }
 
     try:
-        # Possible HTTPError
         r1 = get(api_url, prepare_payload, headers=headers)
         r1.raise_for_status()
-
         r2 = get(api_url, ready_payload, headers=headers)
         r2.raise_for_status()
-
         r3 = get(api_url, taken_payload, headers=headers)
         r3.raise_for_status()
 
-        # Possible ValueError
         prepare = r1.json()[0]
         ready = r2.json()[0]
         taken = r3.json()[0]
+    # Possible HTTPError, ValueError
     except Exception as e:
         print(f"HTTP respose error: {e}")
     else:
