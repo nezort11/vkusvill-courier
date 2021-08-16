@@ -1,3 +1,7 @@
+#
+# macOS notification center Python module
+#
+
 from subprocess import run
 
 CMD = """

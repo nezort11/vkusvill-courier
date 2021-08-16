@@ -1,3 +1,7 @@
+#!/usr/local/bin/python3
+#
+# Console app for checking new prepare/ready/taken parcels using VkusVill courier API.
+#
 from datetime import datetime, timedelta
 from threading import Timer
 from os import system
@@ -6,7 +10,8 @@ from requests import get
 from util import ID_COURIER, VKUSVILL_TOKEN
 from notify import notify
 
-seen = set()
+prepare_shown = set()
+ready_shown = set()
 
 
 class Parcel:
@@ -18,8 +23,8 @@ class Parcel:
         self.code = parcel['id_order'][-4:]
         self.weight = round(float(parcel['ves']), 1)
         self.distance = round(float(parcel['distance']))
-        self.address = parcel['corr_addr'].replace(
-            "Санкт-Петербург", '').strip(' ,-')
+        self.address = parcel['corr_addr'].replace("Россия", '').replace(
+            "Санкт-Петербург", '').strip(' ,-.')
 
     def __str__(self):
         """Format parcel information."""
@@ -88,12 +93,20 @@ def main():
         print_parcels(ready, 'ready')
         print_parcels(taken, 'taken')
 
-        # Notify about new and ready parcels
+        # Notify about new preparing parcels
+        for p in prepare:
+            parcel = Parcel(p)
+            if parcel.id not in prepare_shown:
+                notify("New parcel!", f"{parcel.weight}kg, {parcel.distance}m")
+                prepare_shown.add(parcel.id)
+
+        # Notify about new ready parcels
         for p in ready:
             parcel = Parcel(p)
-            if parcel.id not in seen:
-                notify("Vkusvill", f"Parcel {parcel.code} is ready!")
-                seen.add(parcel.id)
+            if parcel.id not in ready_shown:
+                notify("Parcel is ready!",
+                       f"{parcel.weight}kg, {parcel.distance}m")
+                ready_shown.add(parcel.id)
 
 
 def check(period):
@@ -105,4 +118,4 @@ def check(period):
 
 if __name__ == "__main__":
     # Poll up API periodicly
-    check(2)
+    check(3)
