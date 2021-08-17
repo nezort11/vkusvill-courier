@@ -1,6 +1,4 @@
-#
-# macOS notification center Python module
-#
+"""macOS notification center for Python."""
 
 from subprocess import run
 
