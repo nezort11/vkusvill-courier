@@ -16,7 +16,7 @@ BASE_HEADERS = {
 class Parcel:
     """Class representing parcel."""
 
-    def __init__(self, parcel):
+    def __init__(self, parcel: dict):
         """Make parcel object form parcel dict."""
         self.id = parcel['id_order']
         self.code = parcel['id_order'][-4:]
@@ -28,6 +28,10 @@ class Parcel:
     def __str__(self):
         """Format parcel information."""
         return f"{self.distance}m {self.weight}kg - {self.address} [{self.code}]"
+
+    def __repr__(self):
+        """Represent parcel."""
+        return f"<Parcel id={self.id}, distance={self.distance}, weight={self.weight}>"
 
 
 class VkusVillCourierAPI:
