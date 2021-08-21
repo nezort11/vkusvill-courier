@@ -70,6 +70,11 @@ def check(update: Update, context: CallbackContext):
                     update.effective_chat.id,
                     f"New parcel!\n{p.distance}m, {p.weight}kg"
                 )
+                context.bot.send_location(
+                    update.effective_chat.id,
+                    p.latitude,
+                    p.longitude
+                )
                 prepare_set.add(p.id)
 
         for p in ready:

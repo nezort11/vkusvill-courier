@@ -24,6 +24,8 @@ class Parcel:
         self.distance = round(float(parcel['distance']))
         self.address = parcel['corr_addr'].replace("Россия", '').replace(
             "Санкт-Петербург", '').strip(' ,-.')
+        self.latitude = float(parcel['latitude'])
+        self.longitude = float(parcel['longitude'])
 
     def __str__(self):
         """Format parcel information."""
